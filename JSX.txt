@@ -1,0 +1,100 @@
+// App.js
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import UserList from './UserList';
+import AddUserForm from './AddUserForm';
+
+const API_URL = 'https://jsonplaceholder.typicode.com/users';
+
+const App = () => {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    // Fetch users from the API
+    axios.get(API_URL)
+      .then(response => setUsers(response.data))
+      .catch(error => console.error('Error fetching users:', error));
+  }, []);
+
+  const addUser = newUser => {
+    // Simulate adding a user to the mock API
+    setUsers([...users, newUser]);
+  };
+
+  const editUser = (userId, updatedUser) => {
+    // Simulate updating a user in the mock API
+    setUsers(users.map(user => (user.id === userId ? updatedUser : user)));
+  };
+
+  const deleteUser = userId => {
+    // Simulate deleting a user from the mock API
+    setUsers(users.filter(user => user.id !== userId));
+  };
+
+  return (
+    <div>
+      <h1>User Management System</h1>
+      <UserList users={users} deleteUser={deleteUser} editUser={editUser} />
+      <AddUserForm addUser={addUser} />
+    </div>
+  );
+};
+
+export default App;
+// UserList.js
+import React from 'react';
+
+const UserList = ({ users, deleteUser, editUser }) => {
+  return (
+    <div>
+      <h2>User List</h2>
+      <ul>
+        {users.map(user => (
+          <li key={user.id}>
+            {user.name}
+            <button onClick={() => editUser(user.id, { ...user, name: 'Updated Name' })}>Edit</button>
+            <button onClick={() => deleteUser(user.id)}>Delete</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default UserList;
+// AddUserForm.js
+import React, { useState } from 'react';
+
+const AddUserForm = ({ addUser }) => {
+  const [userName, setUserName] = useState('');
+
+  const handleSubmit = event => {
+    event.preventDefault();
+
+    if (userName.trim() === '') {
+      alert('Please enter a valid username');
+      return;
+    }
+
+    // Simulate adding a user to the mock API
+    addUser({ id: Date.now(), name: userName });
+    setUserName('');
+  };
+
+  return (
+    <div>
+      <h2>Add User</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Enter username"
+          value={userName}
+          onChange={e => setUserName(e.target.value)}
+        />
+        <button type="submit">Add User</button>
+      </form>
+    </div>
+  );
+};
+
+export default AddUserForm;
